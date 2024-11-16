@@ -81,16 +81,35 @@ def handle_account(account):
         print("Đã click vào nút Claim...")
         time.sleep(10)
 
+        # Click nút Close
+        close_button = WebDriverWait(driver, 20).until(
+            EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Close')]"))
+        )
+        close_button.click()
+        print("Đã click vào nút Close để xác nhận Transaction...")
+        time.sleep(5)
+
         # Lặp lại việc click nút Claim mỗi 2 giờ
         while True:
             print(f"Chờ 2 tiếng để Claim tiếp theo cho tài khoản: {account['name']}")
-            time.sleep(7250)  # Chờ 2 tiếng
+            time.sleep(7200)  # Chờ 2 tiếng
+
+            # Click nút Claim
+            driver.switch_to.frame(iframe)  # Chuyển lại vào iframe
             claim_button = WebDriverWait(driver, 20).until(
                 EC.element_to_be_clickable((By.XPATH, "//img[@alt='Claim']"))
             )
             claim_button.click()
             print(f"Đã Claim thành công cho tài khoản: {account['name']}")
             time.sleep(10)
+
+            # Click nút Close
+            close_button = WebDriverWait(driver, 20).until(
+                EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Close')]"))
+            )
+            close_button.click()
+            print("Đã click vào nút Close để xác nhận Transaction...")
+            time.sleep(5)
 
     except Exception as e:
         print(f"Lỗi xảy ra với tài khoản {account['name']}: {e}")
