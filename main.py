@@ -92,7 +92,7 @@ def handle_account(account):
         # Lặp lại việc click nút Claim mỗi 2 giờ
         while True:
             print(f"Chờ 2 tiếng để Claim tiếp theo cho tài khoản: {account['name']}")
-            time.sleep(7200)  # Chờ 2 tiếng
+            time.sleep(7230)  # Chờ 2 tiếng
 
             # Click nút Claim
             driver.switch_to.frame(iframe)  # Chuyển lại vào iframe
