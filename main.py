@@ -135,43 +135,63 @@ def handle_account(account, action):
             print(f"Tài khoản {account['name']} đã điểm danh thành công.")
 
         elif action == "2":  # Claim tự động
-            # Click nút Claim
-            claim_button = WebDriverWait(driver, 20).until(
-                EC.element_to_be_clickable((By.XPATH, "//img[@alt='Claim']"))
-            )
-            claim_button.click()
-            print("Đã click vào nút Claim...")
-            time.sleep(10)
+            # Biến thời gian chờ để Claim lần tiếp theo
+            wait_time_seconds = 7230
 
-            # Click nút Close
-            close_button = WebDriverWait(driver, 20).until(
-                EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Close')]"))
-            )
-            close_button.click()
-            print("Đã click vào nút Close để xác nhận Transaction...")
-            time.sleep(5)
-
-            # Lặp lại việc click nút Claim mỗi 2 giờ
             while True:
-                print(f"Chờ 2 tiếng để Claim tiếp theo cho tài khoản: {account['name']}")
-                time.sleep(7230)  # Chờ 2 tiếng
+                try:
+                    # Tìm nút Claim và click
+                    claim_button = WebDriverWait(driver, 20).until(
+                        EC.element_to_be_clickable((By.XPATH, "//img[@alt='Claim']"))
+                    )
+                    claim_button.click()
+                    print(f"Đã Claim thành công cho tài khoản: {account['name']}")
+                    time.sleep(10)
 
-                # Click nút Claim
-                driver.switch_to.frame(iframe)  # Chuyển lại vào iframe
-                claim_button = WebDriverWait(driver, 20).until(
-                    EC.element_to_be_clickable((By.XPATH, "//img[@alt='Claim']"))
-                )
-                claim_button.click()
-                print(f"Đã Claim thành công cho tài khoản: {account['name']}")
-                time.sleep(10)
+                    # Click nút Close
+                    close_button = WebDriverWait(driver, 20).until(
+                        EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Close')]"))
+                    )
+                    close_button.click()
+                    print("Đã click vào nút Close để xác nhận Transaction...")
+                    time.sleep(5)
 
-                # Click nút Close
-                close_button = WebDriverWait(driver, 20).until(
-                    EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Close')]"))
-                )
-                close_button.click()
-                print("Đã click vào nút Close để xác nhận Transaction...")
-                time.sleep(5)
+                    # Sau khi Claim thành công, đặt thời gian chờ mặc định
+                    wait_time_seconds = 7230
+                except:
+                    try:
+                        # Nếu không tìm thấy nút Claim, tìm phần tử thời gian đếm ngược
+                        countdown_timer = WebDriverWait(driver, 20).until(
+                            EC.presence_of_element_located(
+                                (By.XPATH, "//div[contains(@class, 'bg-gradient-to-b')]//span[contains(text(), ':')]")
+                            )
+                        )
+                        countdown_text = countdown_timer.text.strip()
+                        print(f"Đã tìm thấy thời gian đếm ngược: {countdown_text}")
+
+                        # Tính toán thời gian chờ từ text "01:22:08"
+                        hours, minutes, seconds = map(int, countdown_text.split(":"))
+                        wait_time_seconds = hours * 3600 + minutes * 60 + seconds + 5 # 5s cộng thêm để tránh lỗi
+                        print(f"Thời gian chờ tới lần Claim tiếp theo: {wait_time_seconds} giây")
+                    except Exception as e:
+                        print(f"Lỗi khi tìm kiếm thời gian đếm ngược hoặc Claim: {e}")
+                        # Nếu không tìm thấy gì, chờ một khoảng thời gian ngắn trước khi thử lại
+                        wait_time_seconds = 60  # Mặc định chờ 60 giây
+
+                # Chờ tới lần Claim tiếp theo
+                print(f"Chờ {wait_time_seconds} giây để tiếp tục Claim...")
+                time.sleep(wait_time_seconds)
+
+                # Chuyển lại vào iframe để tiếp tục tìm kiếm
+                try:
+                    driver.switch_to.default_content()  # Chuyển về ngữ cảnh chính
+                    iframe = WebDriverWait(driver, 20).until(
+                        EC.presence_of_element_located((By.TAG_NAME, "iframe"))
+                    )
+                    driver.switch_to.frame(iframe)  # Chuyển lại vào iframe
+                except Exception as e:
+                    print(f"Lỗi khi chuyển đổi iframe: {e}")
+                    break
 
     except Exception as e:
         print(f"Lỗi xảy ra với tài khoản {account['name']}: {e}")
