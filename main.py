@@ -13,13 +13,13 @@ accounts = [
         "name": "Hải Bình Ngu Ngốc",
         "chrome_path": "C:\\Others\\Tele Accounts\\84826519744\\GoogleChromePortable\\GoogleChromePortable.exe",
         "user_data_dir": "C:\\Others\\Tele Accounts\\84826519744\\GoogleChromePortable\\Data\\profile\\Default",
-        "debug_port": 9225  # Cổng Remote Debugging riêng
+        "debug_port": 9227  # Cổng Remote Debugging riêng
     },
     {
         "name": "Diễm Hằng Xinh Đẹp",
         "chrome_path": "C:\\Others\\Tele Accounts\\84929895980\\GoogleChromePortable\\GoogleChromePortable.exe",
         "user_data_dir": "C:\\Others\\Tele Accounts\\84929895980\\GoogleChromePortable\\Data\\profile\\Default",
-        "debug_port": 9226  # Cổng Debug riêng
+        "debug_port": 9228  # Cổng Debug riêng
     }
 ]
 
@@ -38,7 +38,7 @@ def init_driver(account):
     return webdriver.Chrome(service=service, options=options)
 
 # Hàm xử lý logic chính
-def handle_account(account):
+def handle_account(account, action):
     driver = None
     try:
         driver = init_driver(account)
@@ -73,34 +73,48 @@ def handle_account(account):
         print("Đã click vào nút Claim now...")
         time.sleep(10)
 
-        # Click nút Claim
-        claim_button = WebDriverWait(driver, 20).until(
-            EC.element_to_be_clickable((By.XPATH, "//img[@alt='Claim']"))
-        )
-        claim_button.click()
-        print("Đã click vào nút Claim...")
-        time.sleep(10)
+        if action == "1":  # Điểm danh hàng ngày
+            try:
+                # Chờ nút "Mission" xuất hiện và click vào
+                mission_button = WebDriverWait(driver, 20).until(
+                    EC.element_to_be_clickable((By.XPATH, "//span[text()='Mission']"))
+                )
+                mission_button.click()
+                print("Đã click vào nút Mission...")
+                time.sleep(5)
 
-        # Click nút Close
-        close_button = WebDriverWait(driver, 20).until(
-            EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Close')]"))
-        )
-        close_button.click()
-        print("Đã click vào nút Close để xác nhận Transaction...")
-        time.sleep(5)
+                # Kiểm tra ngay xem có thông báo đã điểm danh chưa
+                already_checked_in_message = WebDriverWait(driver, 5).until(
+                    EC.presence_of_element_located((By.XPATH, "//p[contains(text(), \"You've already checked in for today.\")]"))
+                )
+                print(f"Tài khoản {account['name']} đã điểm danh trước đó. Thoát profile.")
+                return
 
-        # Lặp lại việc click nút Claim mỗi 2 giờ
-        while True:
-            print(f"Chờ 2 tiếng để Claim tiếp theo cho tài khoản: {account['name']}")
-            time.sleep(7230)  # Chờ 2 tiếng
+            except:
+                # Nếu không có thông báo thì thực hiện điểm danh
+                pass
 
+            # Chờ nút "Check In" xuất hiện và click vào
+            check_in_button = WebDriverWait(driver, 20).until(
+                EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Check In')]"))
+            )
+            check_in_button.click()
+            print("Đã click vào nút Check In...")
+            time.sleep(5)
+
+            # Chờ thông báo điểm danh thành công
+            check_in_success_message = WebDriverWait(driver, 20).until(
+                EC.presence_of_element_located((By.XPATH, "//p[contains(text(), \"You've already checked in for today.\")]"))
+            )
+            print(f"Tài khoản {account['name']} đã điểm danh thành công.")
+
+        elif action == "2":  # Claim tự động
             # Click nút Claim
-            driver.switch_to.frame(iframe)  # Chuyển lại vào iframe
             claim_button = WebDriverWait(driver, 20).until(
                 EC.element_to_be_clickable((By.XPATH, "//img[@alt='Claim']"))
             )
             claim_button.click()
-            print(f"Đã Claim thành công cho tài khoản: {account['name']}")
+            print("Đã click vào nút Claim...")
             time.sleep(10)
 
             # Click nút Close
@@ -110,6 +124,28 @@ def handle_account(account):
             close_button.click()
             print("Đã click vào nút Close để xác nhận Transaction...")
             time.sleep(5)
+
+            # Lặp lại việc click nút Claim mỗi 2 giờ
+            while True:
+                print(f"Chờ 2 tiếng để Claim tiếp theo cho tài khoản: {account['name']}")
+                time.sleep(7230)  # Chờ 2 tiếng
+
+                # Click nút Claim
+                driver.switch_to.frame(iframe)  # Chuyển lại vào iframe
+                claim_button = WebDriverWait(driver, 20).until(
+                    EC.element_to_be_clickable((By.XPATH, "//img[@alt='Claim']"))
+                )
+                claim_button.click()
+                print(f"Đã Claim thành công cho tài khoản: {account['name']}")
+                time.sleep(10)
+
+                # Click nút Close
+                close_button = WebDriverWait(driver, 20).until(
+                    EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Close')]"))
+                )
+                close_button.click()
+                print("Đã click vào nút Close để xác nhận Transaction...")
+                time.sleep(5)
 
     except Exception as e:
         print(f"Lỗi xảy ra với tài khoản {account['name']}: {e}")
@@ -121,10 +157,20 @@ def handle_account(account):
 
 # Hàm chính
 def main():
+    # Prompt để người dùng chọn hành động
+    print("Chọn hành động bạn muốn thực hiện:")
+    print("1: Điểm danh hàng ngày")
+    print("2: Claim tự động")
+    action = input("Nhập số (1 hoặc 2): ")
+
+    if action not in ["1", "2"]:
+        print("Hành động không hợp lệ! Vui lòng chạy lại chương trình.")
+        return
+
     processes = []
     for account in accounts:
         # Tạo một tiến trình riêng cho mỗi tài khoản
-        p = Process(target=handle_account, args=(account,))
+        p = Process(target=handle_account, args=(account, action))
         processes.append(p)
         p.start()
 
