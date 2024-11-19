@@ -20,6 +20,18 @@ accounts = [
         "chrome_path": "C:\\Others\\Tele Accounts\\84929895980\\GoogleChromePortable\\GoogleChromePortable.exe",
         "user_data_dir": "C:\\Others\\Tele Accounts\\84929895980\\GoogleChromePortable\\Data\\profile\\Default",
         "debug_port": 9228  # Cổng Debug riêng
+    },
+    {
+        "name": "Bình Minh Lên Rồi",
+        "chrome_path": "C:\\Others\\Tele Accounts\\84925599903\\GoogleChromePortable\\GoogleChromePortable.exe",
+        "user_data_dir": "C:\\Others\\Tele Accounts\\84925599903\\GoogleChromePortable\\Data\\profile\\Default",
+        "debug_port": 9223  # Cổng Remote Debugging riêng
+    },
+    {
+        "name": "Đình Diệu Diệu Kỳ",
+        "chrome_path": "C:\\Others\\Tele Accounts\\84567845408\\GoogleChromePortable\\GoogleChromePortable.exe",
+        "user_data_dir": "C:\\Others\\Tele Accounts\\84567845408\\GoogleChromePortable\\Data\\profile\\Default",
+        "debug_port": 9224  # Cổng Remote Debugging riêng
     }
 ]
 
