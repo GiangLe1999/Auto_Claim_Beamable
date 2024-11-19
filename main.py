@@ -13,25 +13,33 @@ accounts = [
         "name": "Hải Bình Ngu Ngốc",
         "chrome_path": "C:\\Others\\Tele Accounts\\84826519744\\GoogleChromePortable\\GoogleChromePortable.exe",
         "user_data_dir": "C:\\Others\\Tele Accounts\\84826519744\\GoogleChromePortable\\Data\\profile\\Default",
-        "debug_port": 9227  # Cổng Remote Debugging riêng
+        "debug_port": 9227,  # Cổng Remote Debugging riêng
+        "window_size": "500,700",  # Kích thước cửa sổ
+        "window_position": "0,0"   # Vị trí cửa sổ
     },
     {
         "name": "Diễm Hằng Xinh Đẹp",
         "chrome_path": "C:\\Others\\Tele Accounts\\84929895980\\GoogleChromePortable\\GoogleChromePortable.exe",
         "user_data_dir": "C:\\Others\\Tele Accounts\\84929895980\\GoogleChromePortable\\Data\\profile\\Default",
-        "debug_port": 9228  # Cổng Debug riêng
+        "debug_port": 9228,  # Cổng Debug riêng
+        "window_size": "500,700",
+        "window_position": "500,0"
     },
     {
         "name": "Bình Minh Lên Rồi",
         "chrome_path": "C:\\Others\\Tele Accounts\\84925599903\\GoogleChromePortable\\GoogleChromePortable.exe",
         "user_data_dir": "C:\\Others\\Tele Accounts\\84925599903\\GoogleChromePortable\\Data\\profile\\Default",
-        "debug_port": 9223  # Cổng Remote Debugging riêng
+        "debug_port": 9223,  # Cổng Remote Debugging riêng
+        "window_size": "500,700",
+        "window_position": "1000,0"
     },
     {
         "name": "Đình Diệu Diệu Kỳ",
         "chrome_path": "C:\\Others\\Tele Accounts\\84567845408\\GoogleChromePortable\\GoogleChromePortable.exe",
         "user_data_dir": "C:\\Others\\Tele Accounts\\84567845408\\GoogleChromePortable\\Data\\profile\\Default",
-        "debug_port": 9224  # Cổng Remote Debugging riêng
+        "debug_port": 9224,  # Cổng Remote Debugging riêng
+        "window_size": "500,700",
+        "window_position": "1400,0"
     }
 ]
 
@@ -44,6 +52,12 @@ def init_driver(account):
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--disable-extensions")
     options.add_argument(f"--remote-debugging-port={account['debug_port']}")  # Cổng Debug riêng
+
+    # Kích thước và vị trí cửa sổ từ cấu hình
+    window_size = account.get("window_size", "500,700")
+    window_position = account.get("window_position", "0,0")
+    options.add_argument(f"--window-size={window_size}")
+    options.add_argument(f"--window-position={window_position}")
 
     # Sử dụng webdriver-manager để tự động tải ChromeDriver
     service = Service(ChromeDriverManager().install())
