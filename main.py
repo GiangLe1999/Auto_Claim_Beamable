@@ -11,38 +11,38 @@ from multiprocessing import Process, Event
 
 # Cấu hình tài khoản
 accounts = [
-    # {
-    #     "name": "Hải Bình Ngu Ngốc",
-    #     "chrome_path": "C:\\Others\\Tele Accounts\\84826519744\\GoogleChromePortable\\GoogleChromePortable.exe",
-    #     "user_data_dir": "C:\\Others\\Tele Accounts\\84826519744\\GoogleChromePortable\\Data\\profile\\Default",
-    #     "debug_port": 9227,  # Cổng Remote Debugging riêng
-    #     "window_size": "500,700",  # Kích thước cửa sổ
-    #     "window_position": "0,0"   # Vị trí cửa sổ
-    # },
-    # {
-    #     "name": "Diễm Hằng Xinh Đẹp",
-    #     "chrome_path": "C:\\Others\\Tele Accounts\\84929895980\\GoogleChromePortable\\GoogleChromePortable.exe",
-    #     "user_data_dir": "C:\\Others\\Tele Accounts\\84929895980\\GoogleChromePortable\\Data\\profile\\Default",
-    #     "debug_port": 9228,  # Cổng Debug riêng
-    #     "window_size": "500,700",
-    #     "window_position": "500,0"
-    # },
     {
-        "name": "Bình Minh Lên Rồi",
-        "chrome_path": "C:\\Others\\Tele Accounts\\84925599903\\GoogleChromePortable\\GoogleChromePortable.exe",
-        "user_data_dir": "C:\\Others\\Tele Accounts\\84925599903\\GoogleChromePortable\\Data\\profile\\Default",
-        "debug_port": 9223,  # Cổng Remote Debugging riêng
-        "window_size": "500,700",
-        "window_position": "1000,0"
+        "name": "Hải Bình Ngu Ngốc",
+        "chrome_path": "C:\\Others\\Tele Accounts\\84826519744\\GoogleChromePortable\\GoogleChromePortable.exe",
+        "user_data_dir": "C:\\Others\\Tele Accounts\\84826519744\\GoogleChromePortable\\Data\\profile\\Default",
+        "debug_port": 9227,  # Cổng Remote Debugging riêng
+        "window_size": "500,700",  # Kích thước cửa sổ
+        "window_position": "0,0"   # Vị trí cửa sổ
     },
     {
-        "name": "Đình Diệu Diệu Kỳ",
-        "chrome_path": "C:\\Others\\Tele Accounts\\84567845408\\GoogleChromePortable\\GoogleChromePortable.exe",
-        "user_data_dir": "C:\\Others\\Tele Accounts\\84567845408\\GoogleChromePortable\\Data\\profile\\Default",
-        "debug_port": 9224,  # Cổng Remote Debugging riêng
+        "name": "Diễm Hằng Xinh Đẹp",
+        "chrome_path": "C:\\Others\\Tele Accounts\\84929895980\\GoogleChromePortable\\GoogleChromePortable.exe",
+        "user_data_dir": "C:\\Others\\Tele Accounts\\84929895980\\GoogleChromePortable\\Data\\profile\\Default",
+        "debug_port": 9228,  # Cổng Debug riêng
         "window_size": "500,700",
-        "window_position": "1500,0"
-    }
+        "window_position": "500,0"
+    },
+    # {
+    #     "name": "Bình Minh Lên Rồi",
+    #     "chrome_path": "C:\\Others\\Tele Accounts\\84925599903\\GoogleChromePortable\\GoogleChromePortable.exe",
+    #     "user_data_dir": "C:\\Others\\Tele Accounts\\84925599903\\GoogleChromePortable\\Data\\profile\\Default",
+    #     "debug_port": 9223,  # Cổng Remote Debugging riêng
+    #     "window_size": "500,700",
+    #     "window_position": "1000,0"
+    # },
+    # {
+    #     "name": "Đình Diệu Diệu Kỳ",
+    #     "chrome_path": "C:\\Others\\Tele Accounts\\84567845408\\GoogleChromePortable\\GoogleChromePortable.exe",
+    #     "user_data_dir": "C:\\Others\\Tele Accounts\\84567845408\\GoogleChromePortable\\Data\\profile\\Default",
+    #     "debug_port": 9224,  # Cổng Remote Debugging riêng
+    #     "window_size": "500,700",
+    #     "window_position": "1500,0"
+    # }
 ]
 
 # Thêm một Event để dừng tất cả các tiến trình
