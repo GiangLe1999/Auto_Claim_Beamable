@@ -25,22 +25,22 @@ accounts = [
         "window_size": "500,700",
         "window_position": "500,0"
     },
-    {
-        "name": "Bình Minh Lên Rồi",
-        "chrome_path": "C:\\Others\\Tele Accounts\\84925599903\\GoogleChromePortable\\GoogleChromePortable.exe",
-        "user_data_dir": "C:\\Others\\Tele Accounts\\84925599903\\GoogleChromePortable\\Data\\profile\\Default",
-        "debug_port": 9223,  # Cổng Remote Debugging riêng
-        "window_size": "500,700",
-        "window_position": "1000,0"
-    },
-    {
-        "name": "Đình Diệu Diệu Kỳ",
-        "chrome_path": "C:\\Others\\Tele Accounts\\84567845408\\GoogleChromePortable\\GoogleChromePortable.exe",
-        "user_data_dir": "C:\\Others\\Tele Accounts\\84567845408\\GoogleChromePortable\\Data\\profile\\Default",
-        "debug_port": 9224,  # Cổng Remote Debugging riêng
-        "window_size": "500,700",
-        "window_position": "1400,0"
-    }
+    # {
+    #     "name": "Bình Minh Lên Rồi",
+    #     "chrome_path": "C:\\Others\\Tele Accounts\\84925599903\\GoogleChromePortable\\GoogleChromePortable.exe",
+    #     "user_data_dir": "C:\\Others\\Tele Accounts\\84925599903\\GoogleChromePortable\\Data\\profile\\Default",
+    #     "debug_port": 9223,  # Cổng Remote Debugging riêng
+    #     "window_size": "500,700",
+    #     "window_position": "1000,0"
+    # },
+    # {
+    #     "name": "Đình Diệu Diệu Kỳ",
+    #     "chrome_path": "C:\\Others\\Tele Accounts\\84567845408\\GoogleChromePortable\\GoogleChromePortable.exe",
+    #     "user_data_dir": "C:\\Others\\Tele Accounts\\84567845408\\GoogleChromePortable\\Data\\profile\\Default",
+    #     "debug_port": 9224,  # Cổng Remote Debugging riêng
+    #     "window_size": "500,700",
+    #     "window_position": "1400,0"
+    # }
 ]
 
 # Hàm khởi tạo Selenium driver
@@ -127,6 +127,24 @@ def handle_daily_check_in(driver, account):
     except Exception as e:
         print(f"Lỗi khi thực hiện điểm danh hàng ngày cho tài khoản {account['name']}: {e}")
 
+# Hàm get thời gian chờ
+def get_wait_time_from_countdown(driver, xpath, default_wait=60):
+    try:
+        countdown_timer = WebDriverWait(driver, 20).until(
+            EC.presence_of_element_located((By.XPATH, xpath))
+        )
+        countdown_text = countdown_timer.text.strip()
+        print(f"Thời gian đếm ngược tìm thấy: {countdown_text}")
+
+        # Tính toán thời gian chờ từ định dạng hh:mm:ss
+        hours, minutes, seconds = map(int, countdown_text.split(":"))
+        wait_time_seconds = hours * 3600 + minutes * 60 + seconds + 5  # Thêm 5 giây để tránh lỗi
+        print(f"Thời gian chờ tiếp theo: {wait_time_seconds} giây")
+        return wait_time_seconds
+    except Exception as e:
+        print(f"Lỗi khi tính toán thời gian chờ: {e}")
+        return default_wait
+
 # Hàm Claim và quản lý thời gian chờ
 def handle_claim(driver,account):
     while True:
@@ -143,31 +161,29 @@ def handle_claim(driver,account):
             time.sleep(10)
 
             # Click nút Close
-            close_button = WebDriverWait(driver, 20).until(
+            close_button = WebDriverWait(driver, 30).until(
                 EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Close')]"))
             )
             close_button.click()
             print("Đã click vào nút Close để xác nhận Transaction...")
             time.sleep(5)
 
-            # Đặt thời gian chờ mặc định
-            wait_time_seconds = 7230
+            # Lấy thời gian chờ từ đồng hồ đếm ngược
+            wait_time_seconds = get_wait_time_from_countdown(
+                driver,
+                xpath="//div[contains(@class, 'bg-gradient-to-b')]//span[contains(text(), ':')]",
+                default_wait=60  # Thời gian chờ mặc định nếu không tìm thấy đồng hồ
+            )
             print(f"Đặt thời gian chờ: {wait_time_seconds} giây")
 
         except Exception as e:
             try:
                 # Nếu không tìm thấy nút Claim, kiểm tra thời gian chờ
-                countdown_timer = WebDriverWait(driver, 20).until(
-                    EC.presence_of_element_located(
-                        (By.XPATH, "//div[contains(@class, 'bg-gradient-to-b')]//span[contains(text(), ':')]")
-                    )
+                wait_time_seconds = get_wait_time_from_countdown(
+                    driver,
+                    xpath="//div[contains(@class, 'bg-gradient-to-b')]//span[contains(text(), ':')]",
+                    default_wait=60
                 )
-                countdown_text = countdown_timer.text.strip()
-                print(f"Thời gian đếm ngược tìm thấy: {countdown_text}")
-
-                # Tính toán thời gian chờ
-                hours, minutes, seconds = map(int, countdown_text.split(":"))
-                wait_time_seconds = hours * 3600 + minutes * 60 + seconds + 5
                 print(f"Thời gian chờ tiếp theo: {wait_time_seconds} giây")
 
             except Exception as countdown_exception:
