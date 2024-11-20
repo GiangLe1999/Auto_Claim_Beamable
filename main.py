@@ -43,15 +43,15 @@ accounts = [
     }
 ]
 
-# Hàm khởi tạo Selenium
+# Hàm khởi tạo Selenium driver
 def init_driver(account):
     options = webdriver.ChromeOptions()
     options.binary_location = account["chrome_path"]
-    options.add_argument(f"--user-data-dir={account['user_data_dir']}")  # Thư mục dữ liệu riêng
+    options.add_argument(f"--user-data-dir={account['user_data_dir']}")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--disable-extensions")
-    options.add_argument(f"--remote-debugging-port={account['debug_port']}")  # Cổng Debug riêng
+    options.add_argument(f"--remote-debugging-port={account['debug_port']}")
 
     # Kích thước và vị trí cửa sổ từ cấu hình
     window_size = account.get("window_size", "500,700")
@@ -59,18 +59,12 @@ def init_driver(account):
     options.add_argument(f"--window-size={window_size}")
     options.add_argument(f"--window-position={window_position}")
 
-    # Sử dụng webdriver-manager để tự động tải ChromeDriver
     service = Service(ChromeDriverManager().install())
     return webdriver.Chrome(service=service, options=options)
 
-# Hàm xử lý logic chính
-def handle_account(account, action):
-    driver = None
+# Hàm thực hiện các thao tác trên MetaCat Bot
+def perform_meta_cat_actions(driver, account):
     try:
-        driver = init_driver(account)
-        print(f"Đang xử lý tài khoản: {account['name']}")
-
-        # Truy cập tới MetaCat Bot
         driver.get("https://web.telegram.org/k/#@MTZCat_bot")
         print(f"Đang mở MetaCat Bot cho tài khoản: {account['name']}")
         time.sleep(5)
@@ -83,12 +77,12 @@ def handle_account(account, action):
         print("Đã click vào nút Start Game...")
         time.sleep(5)
 
-        # Chuyển sang iframe (cửa sổ con của MetaCat Bot)
+        # Chuyển sang iframe
         WebDriverWait(driver, 20).until(
             EC.presence_of_element_located((By.TAG_NAME, "iframe"))
         )
         iframe = driver.find_element(By.TAG_NAME, "iframe")
-        driver.switch_to.frame(iframe)  # Chuyển ngữ cảnh sang iframe
+        driver.switch_to.frame(iframe)
         print("Đã chuyển sang iframe của MetaCat Bot...")
 
         # Click nút Claim now
@@ -98,131 +92,133 @@ def handle_account(account, action):
         claim_now_button.click()
         print("Đã click vào nút Claim now...")
         time.sleep(10)
+    except Exception as e:
+        print(f"Lỗi khi thực hiện thao tác trên MetaCat Bot cho tài khoản {account['name']}: {e}")
 
-        if action == "1":  # Điểm danh hàng ngày
-            try:
-                # Chờ nút "Mission" xuất hiện và click vào
-                mission_button = WebDriverWait(driver, 20).until(
-                    EC.element_to_be_clickable((By.XPATH, "//span[text()='Mission']"))
-                )
-                mission_button.click()
-                print("Đã click vào nút Mission...")
-                time.sleep(5)
+# Hàm thực hiện logic điểm danh hàng ngày
+def handle_daily_check_in(driver, account):
+    try:
+        perform_meta_cat_actions(driver, account)
 
-                # Kiểm tra ngay xem có thông báo đã điểm danh chưa
-                already_checked_in_message = WebDriverWait(driver, 5).until(
-                    EC.presence_of_element_located((By.XPATH, "//p[contains(text(), \"You've already checked in for today.\")]"))
-                )
-                print(f"Tài khoản {account['name']} đã điểm danh trước đó. Thoát profile.")
-                return
+        # Click nút Mission
+        mission_button = WebDriverWait(driver, 20).until(
+            EC.element_to_be_clickable((By.XPATH, "//span[text()='Mission']"))
+        )
+        mission_button.click()
+        print(f"Đã click vào nút Mission cho tài khoản: {account['name']}")
+        time.sleep(5)
 
-            except:
-                # Nếu không có thông báo thì thực hiện điểm danh
-                pass
-
-            # Chờ nút "Check In" xuất hiện và click vào
+        # Kiểm tra thông báo đã điểm danh
+        try:
+            already_checked_in_message = WebDriverWait(driver, 5).until(
+                EC.presence_of_element_located((By.XPATH, "//p[contains(text(), \"You've already checked in for today.\")]"))
+            )
+            print(f"Tài khoản {account['name']} đã điểm danh trước đó.")
+        except:
+            # Thực hiện điểm danh
             check_in_button = WebDriverWait(driver, 20).until(
                 EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Check In')]"))
             )
             check_in_button.click()
-            print("Đã click vào nút Check In...")
+            print(f"Đã điểm danh thành công cho tài khoản: {account['name']}")
             time.sleep(5)
 
-            # Chờ thông báo điểm danh thành công
-            check_in_success_message = WebDriverWait(driver, 20).until(
-                EC.presence_of_element_located((By.XPATH, "//p[contains(text(), \"You've already checked in for today.\")]"))
-            )
-            print(f"Tài khoản {account['name']} đã điểm danh thành công.")
-
-        elif action == "2":  # Claim tự động
-            # Biến thời gian chờ để Claim lần tiếp theo
-            wait_time_seconds = 7230
-
-            while True:
-                try:
-                    # Tìm nút Claim và click
-                    claim_button = WebDriverWait(driver, 20).until(
-                        EC.element_to_be_clickable((By.XPATH, "//img[@alt='Claim']"))
-                    )
-                    claim_button.click()
-                    print(f"Đã Claim thành công cho tài khoản: {account['name']}")
-                    time.sleep(10)
-
-                    # Click nút Close
-                    close_button = WebDriverWait(driver, 20).until(
-                        EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Close')]"))
-                    )
-                    close_button.click()
-                    print("Đã click vào nút Close để xác nhận Transaction...")
-                    time.sleep(5)
-
-                    # Sau khi Claim thành công, đặt thời gian chờ mặc định
-                    wait_time_seconds = 7230
-                except:
-                    try:
-                        # Nếu không tìm thấy nút Claim, tìm phần tử thời gian đếm ngược
-                        countdown_timer = WebDriverWait(driver, 20).until(
-                            EC.presence_of_element_located(
-                                (By.XPATH, "//div[contains(@class, 'bg-gradient-to-b')]//span[contains(text(), ':')]")
-                            )
-                        )
-                        countdown_text = countdown_timer.text.strip()
-                        print(f"Đã tìm thấy thời gian đếm ngược: {countdown_text}")
-
-                        # Tính toán thời gian chờ từ text "01:22:08"
-                        hours, minutes, seconds = map(int, countdown_text.split(":"))
-                        wait_time_seconds = hours * 3600 + minutes * 60 + seconds + 5 # 5s cộng thêm để tránh lỗi
-                        print(f"Thời gian chờ tới lần Claim tiếp theo: {wait_time_seconds} giây")
-                    except Exception as e:
-                        print(f"Lỗi khi tìm kiếm thời gian đếm ngược hoặc Claim: {e}")
-                        # Nếu không tìm thấy gì, chờ một khoảng thời gian ngắn trước khi thử lại
-                        wait_time_seconds = 60  # Mặc định chờ 60 giây
-
-                # Chờ tới lần Claim tiếp theo
-                print(f"Chờ {wait_time_seconds} giây để tiếp tục Claim...")
-                time.sleep(wait_time_seconds)
-
-                # Chuyển lại vào iframe để tiếp tục tìm kiếm
-                try:
-                    driver.switch_to.default_content()  # Chuyển về ngữ cảnh chính
-                    iframe = WebDriverWait(driver, 20).until(
-                        EC.presence_of_element_located((By.TAG_NAME, "iframe"))
-                    )
-                    driver.switch_to.frame(iframe)  # Chuyển lại vào iframe
-                except Exception as e:
-                    print(f"Lỗi khi chuyển đổi iframe: {e}")
-                    break
-
-    except Exception as e:
-        print(f"Lỗi xảy ra với tài khoản {account['name']}: {e}")
-
-    finally:
-        if driver:
             driver.quit()
-            print(f"Đã đóng trình duyệt cho tài khoản: {account['name']}")
+    except Exception as e:
+        print(f"Lỗi khi thực hiện điểm danh hàng ngày cho tài khoản {account['name']}: {e}")
 
-# Hàm chính
+# Hàm Claim và quản lý thời gian chờ
+def handle_claim(driver,account):
+    while True:
+        try:
+            # Bắt đầu thực hiện các thao tác
+            perform_meta_cat_actions(driver, account)
+
+            # Thực hiện Claim
+            claim_button = WebDriverWait(driver, 20).until(
+                EC.element_to_be_clickable((By.XPATH, "//img[@alt='Claim']"))
+            )
+            claim_button.click()
+            print(f"Đã Claim thành công cho tài khoản: {account['name']}")
+            time.sleep(10)
+
+            # Click nút Close
+            close_button = WebDriverWait(driver, 20).until(
+                EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Close')]"))
+            )
+            close_button.click()
+            print("Đã click vào nút Close để xác nhận Transaction...")
+            time.sleep(5)
+
+            # Đặt thời gian chờ mặc định
+            wait_time_seconds = 7230
+            print(f"Đặt thời gian chờ: {wait_time_seconds} giây")
+
+        except Exception as e:
+            try:
+                # Nếu không tìm thấy nút Claim, kiểm tra thời gian chờ
+                countdown_timer = WebDriverWait(driver, 20).until(
+                    EC.presence_of_element_located(
+                        (By.XPATH, "//div[contains(@class, 'bg-gradient-to-b')]//span[contains(text(), ':')]")
+                    )
+                )
+                countdown_text = countdown_timer.text.strip()
+                print(f"Thời gian đếm ngược tìm thấy: {countdown_text}")
+
+                # Tính toán thời gian chờ
+                hours, minutes, seconds = map(int, countdown_text.split(":"))
+                wait_time_seconds = hours * 3600 + minutes * 60 + seconds + 5
+                print(f"Thời gian chờ tiếp theo: {wait_time_seconds} giây")
+
+            except Exception as countdown_exception:
+                print(f"Lỗi khi tính toán thời gian chờ: {countdown_exception}")
+                wait_time_seconds = 60  # Giá trị chờ mặc định nếu không tìm thấy thời gian
+
+        finally:
+            # Đóng trình duyệt
+            if driver:
+                driver.quit()
+                print(f"Đã đóng trình duyệt cho tài khoản: {account['name']}")
+
+            # Chờ trước khi mở lại và tiếp tục vòng lặp
+            print(f"Chờ {wait_time_seconds} giây trước khi tiếp tục...")
+            time.sleep(wait_time_seconds)
+
+
+def claim_process(account):
+    # Hàm khởi tạo và xử lý logic Claim
+    driver = init_driver(account)
+    handle_claim(driver, account)
+
+def daily_check_in_process(account):
+    # Hàm khởi tạo và xử lý logic Điểm danh hàng ngày
+    driver = init_driver(account)
+    handle_daily_check_in(driver, account)
+
 def main():
-    # Prompt để người dùng chọn hành động
     print("Chọn hành động bạn muốn thực hiện:")
     print("1: Điểm danh hàng ngày")
     print("2: Claim tự động")
     action = input("Nhập số (1 hoặc 2): ")
 
-    if action not in ["1", "2"]:
-        print("Hành động không hợp lệ! Vui lòng chạy lại chương trình.")
-        return
-
     processes = []
     for account in accounts:
-        # Tạo một tiến trình riêng cho mỗi tài khoản
-        p = Process(target=handle_account, args=(account, action))
+        if action == "1":
+            # Truyền hàm target là daily_check_in_process
+            p = Process(target=daily_check_in_process, args=(account,))
+        elif action == "2":
+            # Truyền hàm target là claim_process
+            p = Process(target=claim_process, args=(account,))
+        else:
+            print("Hành động không hợp lệ! Vui lòng chọn 1 hoặc 2.")
+            return
+
         processes.append(p)
         p.start()
 
-    # Đợi tất cả các tiến trình hoàn thành
     for p in processes:
         p.join()
+
 
 if __name__ == "__main__":
     main()
