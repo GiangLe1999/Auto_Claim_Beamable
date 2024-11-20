@@ -5,43 +5,70 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
-from multiprocessing import Process
+import os
+import datetime
+from multiprocessing import Process, Event
 
 # Cấu hình tài khoản
 accounts = [
-    {
-        "name": "Hải Bình Ngu Ngốc",
-        "chrome_path": "C:\\Others\\Tele Accounts\\84826519744\\GoogleChromePortable\\GoogleChromePortable.exe",
-        "user_data_dir": "C:\\Others\\Tele Accounts\\84826519744\\GoogleChromePortable\\Data\\profile\\Default",
-        "debug_port": 9227,  # Cổng Remote Debugging riêng
-        "window_size": "500,700",  # Kích thước cửa sổ
-        "window_position": "0,0"   # Vị trí cửa sổ
-    },
-    {
-        "name": "Diễm Hằng Xinh Đẹp",
-        "chrome_path": "C:\\Others\\Tele Accounts\\84929895980\\GoogleChromePortable\\GoogleChromePortable.exe",
-        "user_data_dir": "C:\\Others\\Tele Accounts\\84929895980\\GoogleChromePortable\\Data\\profile\\Default",
-        "debug_port": 9228,  # Cổng Debug riêng
-        "window_size": "500,700",
-        "window_position": "500,0"
-    },
     # {
-    #     "name": "Bình Minh Lên Rồi",
-    #     "chrome_path": "C:\\Others\\Tele Accounts\\84925599903\\GoogleChromePortable\\GoogleChromePortable.exe",
-    #     "user_data_dir": "C:\\Others\\Tele Accounts\\84925599903\\GoogleChromePortable\\Data\\profile\\Default",
-    #     "debug_port": 9223,  # Cổng Remote Debugging riêng
-    #     "window_size": "500,700",
-    #     "window_position": "1000,0"
+    #     "name": "Hải Bình Ngu Ngốc",
+    #     "chrome_path": "C:\\Others\\Tele Accounts\\84826519744\\GoogleChromePortable\\GoogleChromePortable.exe",
+    #     "user_data_dir": "C:\\Others\\Tele Accounts\\84826519744\\GoogleChromePortable\\Data\\profile\\Default",
+    #     "debug_port": 9227,  # Cổng Remote Debugging riêng
+    #     "window_size": "500,700",  # Kích thước cửa sổ
+    #     "window_position": "0,0"   # Vị trí cửa sổ
     # },
     # {
-    #     "name": "Đình Diệu Diệu Kỳ",
-    #     "chrome_path": "C:\\Others\\Tele Accounts\\84567845408\\GoogleChromePortable\\GoogleChromePortable.exe",
-    #     "user_data_dir": "C:\\Others\\Tele Accounts\\84567845408\\GoogleChromePortable\\Data\\profile\\Default",
-    #     "debug_port": 9224,  # Cổng Remote Debugging riêng
+    #     "name": "Diễm Hằng Xinh Đẹp",
+    #     "chrome_path": "C:\\Others\\Tele Accounts\\84929895980\\GoogleChromePortable\\GoogleChromePortable.exe",
+    #     "user_data_dir": "C:\\Others\\Tele Accounts\\84929895980\\GoogleChromePortable\\Data\\profile\\Default",
+    #     "debug_port": 9228,  # Cổng Debug riêng
     #     "window_size": "500,700",
-    #     "window_position": "1400,0"
-    # }
+    #     "window_position": "500,0"
+    # },
+    {
+        "name": "Bình Minh Lên Rồi",
+        "chrome_path": "C:\\Others\\Tele Accounts\\84925599903\\GoogleChromePortable\\GoogleChromePortable.exe",
+        "user_data_dir": "C:\\Others\\Tele Accounts\\84925599903\\GoogleChromePortable\\Data\\profile\\Default",
+        "debug_port": 9223,  # Cổng Remote Debugging riêng
+        "window_size": "500,700",
+        "window_position": "1000,0"
+    },
+    {
+        "name": "Đình Diệu Diệu Kỳ",
+        "chrome_path": "C:\\Others\\Tele Accounts\\84567845408\\GoogleChromePortable\\GoogleChromePortable.exe",
+        "user_data_dir": "C:\\Others\\Tele Accounts\\84567845408\\GoogleChromePortable\\Data\\profile\\Default",
+        "debug_port": 9224,  # Cổng Remote Debugging riêng
+        "window_size": "500,700",
+        "window_position": "1500,0"
+    }
 ]
+
+# Thêm một Event để dừng tất cả các tiến trình
+shutdown_event = Event()
+
+# Hàm kiểm tra thời gian và tắt máy
+def shutdown_at_target_time(target_hour, target_minute):
+    print(f"Hẹn giờ tắt máy lúc {target_hour:02d}:{target_minute:02d} (giờ Việt Nam)...")
+    while not shutdown_event.is_set():
+        now = datetime.datetime.now()
+        # Chuyển sang múi giờ Việt Nam (+7 GMT nếu cần thiết)
+        current_hour = now.hour
+        current_minute = now.minute
+
+        if current_hour == target_hour and current_minute >= target_minute:
+            print("Đã đến thời gian hẹn giờ! Dừng chương trình và tắt máy tính...")
+            shutdown_event.set()  # Gửi tín hiệu dừng đến tất cả tiến trình
+
+            # Tắt máy tính
+            if os.name == 'nt':  # Windows
+                os.system("shutdown /s /t 1")
+            else:  # Linux/MacOS
+                os.system("shutdown now")
+
+            break
+        time.sleep(10)  # Kiểm tra mỗi 10 giây
 
 # Hàm khởi tạo Selenium driver
 def init_driver(account):
@@ -147,8 +174,15 @@ def get_wait_time_from_countdown(driver, xpath, default_wait=60):
 
 # Hàm Claim và quản lý thời gian chờ
 def handle_claim(driver,account):
+    is_first_claim = True  # Cờ xác định lần đầu claim
+
     while True:
         try:
+            if not is_first_claim:
+                # Khởi tạo lại driver nếu không phải lần đầu claim
+                print(f"Khởi tạo lại trình duyệt cho tài khoản: {account['name']}")
+                driver = init_driver(account)
+
             # Bắt đầu thực hiện các thao tác
             perform_meta_cat_actions(driver, account)
 
@@ -196,6 +230,9 @@ def handle_claim(driver,account):
                 driver.quit()
                 print(f"Đã đóng trình duyệt cho tài khoản: {account['name']}")
 
+            # Cập nhật trạng thái lần đầu
+            is_first_claim = False
+
             # Chờ trước khi mở lại và tiếp tục vòng lặp
             print(f"Chờ {wait_time_seconds} giây trước khi tiếp tục...")
             time.sleep(wait_time_seconds)
@@ -204,12 +241,14 @@ def handle_claim(driver,account):
 def claim_process(account):
     # Hàm khởi tạo và xử lý logic Claim
     driver = init_driver(account)
-    handle_claim(driver, account)
+    while not shutdown_event.is_set():
+        handle_claim(driver, account)
 
 def daily_check_in_process(account):
     # Hàm khởi tạo và xử lý logic Điểm danh hàng ngày
     driver = init_driver(account)
-    handle_daily_check_in(driver, account)
+    while not shutdown_event.is_set():
+        handle_daily_check_in(driver, account)
 
 def main():
     print("Chọn hành động bạn muốn thực hiện:")
@@ -217,7 +256,18 @@ def main():
     print("2: Claim tự động")
     action = input("Nhập số (1 hoặc 2): ")
 
+    # Đặt giờ tắt máy (giờ Việt Nam, ví dụ: 23:30)
+    target_hour = 23
+    target_minute = 30
+
     processes = []
+
+    # Khởi động tiến trình hẹn giờ
+    shutdown_process = Process(target=shutdown_at_target_time, args=(target_hour, target_minute))
+    shutdown_process.start()
+    processes.append(shutdown_process)
+
+    # Khởi động tiến trình chính theo lựa chọn của người dùng
     for account in accounts:
         if action == "1":
             # Truyền hàm target là daily_check_in_process
