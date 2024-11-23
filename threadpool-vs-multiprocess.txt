@@ -1,0 +1,22 @@
+Cách hoạt động của ThreadPool và Multiprocessing:
+ThreadPoolExecutor:
+Đúng: Chạy kiểu ThreadPool có nghĩa là tạo một tiến trình (process) duy nhất, trong đó có nhiều luồng (threads).
+Đúng: Các luồng trong tiến trình này chia sẻ bộ nhớ và tài nguyên (RAM, biến, đối tượng Python) với nhau.
+Giới hạn: Các threads bị giới hạn bởi Global Interpreter Lock (GIL) trong Python, nên trong mã Python thông thường, chỉ một luồng được thực thi Python bytecode tại một thời điểm (ngoại trừ khi sử dụng các thư viện I/O hoặc tính toán ngoài Python như NumPy, Pandas, v.v.).
+
+Multiprocessing:
+Đúng: Chạy kiểu Multiprocessing có nghĩa là tạo nhiều tiến trình (processes) riêng biệt.
+Đúng: Mỗi process có bộ nhớ riêng và không chia sẻ trực tiếp với các process khác.
+Chưa hoàn toàn đúng: Số lượng process không chỉ bị giới hạn bởi số lõi CPU.
+
+Số lượng process trong Multiprocessing:
+Liên quan đến số lõi CPU:
+Đúng: Máy tính có bao nhiêu lõi CPU, thì chỉ có bấy nhiêu process hoạt động song song hiệu quả trên CPU tại một thời điểm.
+Nếu máy bạn có 4 lõi CPU, tối đa 4 process có thể thực sự chạy song song, các process khác sẽ phải chờ.
+Các lõi có thể là vật lý hoặc luồng xử lý (hyper-threading), nghĩa là một CPU 4 lõi/8 luồng có thể chạy song song 8 tiến trình.
+
+Không giới hạn số process:
+Bạn có thể tạo nhiều hơn số lõi CPU (ví dụ: 10 process trên máy 4 lõi).
+Khi số process vượt quá số lõi, hệ điều hành sẽ thực hiện cơ chế scheduling (lập lịch), cho phép các process thay phiên nhau sử dụng CPU.
+Điều này có thể làm giảm hiệu suất vì phải chuyển đổi ngữ cảnh (context switching) thường xuyên.
+
