@@ -25,48 +25,48 @@ accounts = [
         "user_data_dir": "C:\\Others\\Tele Accounts\\84929895980\\GoogleChromePortable\\Data\\profile\\Default",
         "debug_port": 9221,
     },
-    # {
-    #     "name": "Bình Minh Lên Rồi",
-    #     "chrome_path": "C:\\Others\\Tele Accounts\\84925599903\\GoogleChromePortable\\GoogleChromePortable.exe",
-    #     "user_data_dir": "C:\\Others\\Tele Accounts\\84925599903\\GoogleChromePortable\\Data\\profile\\Default",
-    #     "debug_port": 9222,
-    # },
-    # {
-    #     "name": "Đình Diệu Diệu Kỳ",
-    #     "chrome_path": "C:\\Others\\Tele Accounts\\84567845408\\GoogleChromePortable\\GoogleChromePortable.exe",
-    #     "user_data_dir": "C:\\Others\\Tele Accounts\\84567845408\\GoogleChromePortable\\Data\\profile\\Default",
-    #     "debug_port": 9223,
-    # },
-    # {
-    #     "name": "Đức Trung Hải",
-    #     "chrome_path": "C:\\Others\\Tele Accounts\\84914418511\\GoogleChromePortable\\GoogleChromePortable.exe",
-    #     "user_data_dir": "C:\\Others\\Tele Accounts\\84914418511\\GoogleChromePortable\\Data\\profile\\Default",
-    #     "debug_port": 9224,
-    # },
-    # {
-    #     "name": "Bá Cường BMT",
-    #     "chrome_path": "C:\\Others\\Tele Accounts\\84918134941\\GoogleChromePortable\\GoogleChromePortable.exe",
-    #     "user_data_dir": "C:\\Others\\Tele Accounts\\84918134941\\GoogleChromePortable\\Data\\profile\\Default",
-    #     "debug_port": 9225,
-    # },
-    # {
-    #     "name": "Hải Sơn Thủy Hử",
-    #     "chrome_path": "C:\\Others\\Tele Accounts\\84816828974\\GoogleChromePortable\\GoogleChromePortable.exe",
-    #     "user_data_dir": "C:\\Others\\Tele Accounts\\84816828974\\GoogleChromePortable\\Data\\profile\\Default",
-    #     "debug_port": 9226,
-    # },
-    # {
-    #     "name": "Hồng Mai Đào",
-    #     "chrome_path": "C:\\Others\\Tele Accounts\\84852158289\\GoogleChromePortable\\GoogleChromePortable.exe",
-    #     "user_data_dir": "C:\\Others\\Tele Accounts\\84852158289\\GoogleChromePortable\\Data\\profile\\Default",
-    #     "debug_port": 9227,
-    # },
-    # {
-    #     "name": "Thu Thảo Thảo",
-    #     "chrome_path": "C:\\Others\\Tele Accounts\\84912161609\\GoogleChromePortable\\GoogleChromePortable.exe",
-    #     "user_data_dir": "C:\\Others\\Tele Accounts\\84912161609\\GoogleChromePortable\\Data\\profile\\Default",
-    #     "debug_port": 9228,
-    # }
+    {
+        "name": "Bình Minh Lên Rồi",
+        "chrome_path": "C:\\Others\\Tele Accounts\\84925599903\\GoogleChromePortable\\GoogleChromePortable.exe",
+        "user_data_dir": "C:\\Others\\Tele Accounts\\84925599903\\GoogleChromePortable\\Data\\profile\\Default",
+        "debug_port": 9222,
+    },
+    {
+        "name": "Đình Diệu Diệu Kỳ",
+        "chrome_path": "C:\\Others\\Tele Accounts\\84567845408\\GoogleChromePortable\\GoogleChromePortable.exe",
+        "user_data_dir": "C:\\Others\\Tele Accounts\\84567845408\\GoogleChromePortable\\Data\\profile\\Default",
+        "debug_port": 9223,
+    },
+    {
+        "name": "Đức Trung Hải",
+        "chrome_path": "C:\\Others\\Tele Accounts\\84914418511\\GoogleChromePortable\\GoogleChromePortable.exe",
+        "user_data_dir": "C:\\Others\\Tele Accounts\\84914418511\\GoogleChromePortable\\Data\\profile\\Default",
+        "debug_port": 9224,
+    },
+    {
+        "name": "Bá Cường BMT",
+        "chrome_path": "C:\\Others\\Tele Accounts\\84918134941\\GoogleChromePortable\\GoogleChromePortable.exe",
+        "user_data_dir": "C:\\Others\\Tele Accounts\\84918134941\\GoogleChromePortable\\Data\\profile\\Default",
+        "debug_port": 9225,
+    },
+    {
+        "name": "Hải Sơn Thủy Hử",
+        "chrome_path": "C:\\Others\\Tele Accounts\\84816828974\\GoogleChromePortable\\GoogleChromePortable.exe",
+        "user_data_dir": "C:\\Others\\Tele Accounts\\84816828974\\GoogleChromePortable\\Data\\profile\\Default",
+        "debug_port": 9226,
+    },
+    {
+        "name": "Hồng Mai Đào",
+        "chrome_path": "C:\\Others\\Tele Accounts\\84852158289\\GoogleChromePortable\\GoogleChromePortable.exe",
+        "user_data_dir": "C:\\Others\\Tele Accounts\\84852158289\\GoogleChromePortable\\Data\\profile\\Default",
+        "debug_port": 9227,
+    },
+    {
+        "name": "Thu Thảo Thảo",
+        "chrome_path": "C:\\Others\\Tele Accounts\\84912161609\\GoogleChromePortable\\GoogleChromePortable.exe",
+        "user_data_dir": "C:\\Others\\Tele Accounts\\84912161609\\GoogleChromePortable\\Data\\profile\\Default",
+        "debug_port": 9228,
+    }
 ]
 
 chrome_driver_path = r"C:\Workspace\Python\chromedriver.exe"
@@ -103,7 +103,7 @@ def init_driver(account):
         
         # Thêm các options để giảm tải tài nguyên
         options.add_argument("--disable-gpu")
-        options.add_argument("--disable-software-rasterizer")
+        options.add_argument("--disablce-software-rasterizer")
         options.add_argument("--disable-infobars")
         options.add_argument("--disable-notifications")
         options.add_argument("--disable-logging")
@@ -118,6 +118,7 @@ def init_driver(account):
         options.add_argument("--disable-component-update")
         options.add_argument("--memory-model=low")
         options.add_argument("--disable-backing-store-limit")
+        options.add_argument("--enable-unsafe-swiftshader")
         
         service = Service(chrome_driver_path)
         driver = webdriver.Chrome(service=service, options=options)
@@ -299,8 +300,8 @@ def main():
     print("2: Claim tự động")
     action = input("Chọn (1/2): ")
 
-    target_hour = 2
-    target_minute = 50
+    target_hour = 6
+    target_minute = 45
 
     # Start shutdown timer
     shutdown_thread = threading.Thread(
