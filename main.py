@@ -25,18 +25,18 @@ accounts = [
         "user_data_dir": "C:\\Others\\Tele Accounts\\84929895980\\GoogleChromePortable\\Data\\profile\\Default",
         "debug_port": 9221,
     },
-    {
-        "name": "Bình Minh Lên Rồi",
-        "chrome_path": "C:\\Others\\Tele Accounts\\84925599903\\GoogleChromePortable\\GoogleChromePortable.exe",
-        "user_data_dir": "C:\\Others\\Tele Accounts\\84925599903\\GoogleChromePortable\\Data\\profile\\Default",
-        "debug_port": 9222,
-    },
-    {
-        "name": "Đình Diệu Diệu Kỳ",
-        "chrome_path": "C:\\Others\\Tele Accounts\\84567845408\\GoogleChromePortable\\GoogleChromePortable.exe",
-        "user_data_dir": "C:\\Others\\Tele Accounts\\84567845408\\GoogleChromePortable\\Data\\profile\\Default",
-        "debug_port": 9223,
-    },
+    # {
+    #     "name": "Bình Minh Lên Rồi",
+    #     "chrome_path": "C:\\Others\\Tele Accounts\\84925599903\\GoogleChromePortable\\GoogleChromePortable.exe",
+    #     "user_data_dir": "C:\\Others\\Tele Accounts\\84925599903\\GoogleChromePortable\\Data\\profile\\Default",
+    #     "debug_port": 9222,
+    # },
+    # {
+    #     "name": "Đình Diệu Diệu Kỳ",
+    #     "chrome_path": "C:\\Others\\Tele Accounts\\84567845408\\GoogleChromePortable\\GoogleChromePortable.exe",
+    #     "user_data_dir": "C:\\Others\\Tele Accounts\\84567845408\\GoogleChromePortable\\Data\\profile\\Default",
+    #     "debug_port": 9223,
+    # },
     {
         "name": "Đức Trung Hải",
         "chrome_path": "C:\\Others\\Tele Accounts\\84914418511\\GoogleChromePortable\\GoogleChromePortable.exe",
@@ -122,7 +122,6 @@ def init_driver(account):
         
         service = Service(chrome_driver_path)
         driver = webdriver.Chrome(service=service, options=options)
-        print(f"Khởi tạo driver thành công cho tài khoản: {account['name']}")
         return driver
     except Exception as e:
         print(f"Lỗi khởi tạo driver cho tài khoản {account['name']}: {e}")
@@ -131,29 +130,25 @@ def init_driver(account):
 def perform_meta_cat_actions(driver, account):
     try:
         driver.get("https://web.telegram.org/k/#@MTZCat_bot")
-        print(f"Đang mở MetaCat Bot cho tài khoản: {account['name']}")
-        time.sleep(5 + random.uniform(1, 3))  # Random delay
+        time.sleep(3)  # Random delay
 
         start_game_button = WebDriverWait(driver, 20).until(
             EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), 'Start Game')]"))
         )
         start_game_button.click()
-        print(f"Đã click Start Game: {account['name']}")
-        time.sleep(5 + random.uniform(1, 3))
+        time.sleep(3)
 
         WebDriverWait(driver, 20).until(
             EC.presence_of_element_located((By.TAG_NAME, "iframe"))
         )
         iframe = driver.find_element(By.TAG_NAME, "iframe")
         driver.switch_to.frame(iframe)
-        print(f"Đã chuyển iframe: {account['name']}")
 
         claim_now_button = WebDriverWait(driver, 20).until(
             EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), 'Claim now')]"))
         )
         claim_now_button.click()
-        print(f"Đã click Claim now: {account['name']}")
-        time.sleep(8 + random.uniform(1, 3))
+        time.sleep(3)
         return True
     except Exception as e:
         print(f"Lỗi thao tác MetaCat Bot ({account['name']}): {e}")
@@ -166,8 +161,7 @@ def get_wait_time_from_countdown(driver, xpath, default_wait=60):
         )
         countdown_text = countdown_timer.text.strip()
         hours, minutes, seconds = map(int, countdown_text.split(":"))
-        wait_time_seconds = hours * 3600 + minutes * 60 + seconds + random.uniform(5, 10)
-        print(f"Thời gian chờ: {wait_time_seconds} giây")
+        wait_time_seconds = hours * 3600 + minutes * 60 + seconds + 5
         return wait_time_seconds
     except Exception as e:
         print(f"Lỗi tính thời gian chờ: {e}")
@@ -191,7 +185,7 @@ def handle_single_claim_cycle(driver, account):
         )
         close_button.click()
         print(f"Đã đóng: {account['name']}")
-        time.sleep(5 + random.uniform(1, 3))
+        time.sleep(5)
 
         wait_time = get_wait_time_from_countdown(
             driver,
@@ -205,7 +199,6 @@ def handle_single_claim_cycle(driver, account):
                 driver,
                 "//div[contains(@class, 'bg-gradient-to-b')]//span[contains(text(), ':')]"
             )
-            print(f"Thời gian chờ tiếp theo: {wait_time} giây")
             return wait_time
 
         except Exception as countdown_exception:
@@ -239,7 +232,6 @@ def handle_claim(account):
                 try:
                     driver.quit()
                     active_drivers.get()
-                    print(f"Đã đóng driver: {account['name']}")
                 except:
                     pass
 
@@ -267,7 +259,6 @@ def handle_daily_check_in(account):
             EC.element_to_be_clickable((By.XPATH, "//span[text()='Mission']"))
         )
         mission_button.click()
-        print(f"Đã click Mission: {account['name']}")
         time.sleep(5 + random.uniform(1, 3))
 
         try:
@@ -325,7 +316,7 @@ def main():
         threads.append(thread)
         thread.start()
         # Delay giữa mỗi lần khởi động thread
-        time.sleep(random.uniform(3, 5))
+        time.sleep(4)
 
     # Đợi tất cả threads hoàn thành
     for thread in threads:
