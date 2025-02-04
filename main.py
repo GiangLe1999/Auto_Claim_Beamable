@@ -1,75 +1,59 @@
-
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import TimeoutException
 import time
 import os
 import datetime
 import threading
 from queue import Queue
 import random
+from concurrent.futures import ThreadPoolExecutor
 
 # Cấu hình tài khoản
 accounts = [
     {
-        "name": "Hải Bình Ngu Ngốc",
-        "chrome_path": "C:\\Others\\Tele Accounts\\84826519744\\GoogleChromePortable\\GoogleChromePortable.exe",
-        "user_data_dir": "C:\\Others\\Tele Accounts\\84826519744\\GoogleChromePortable\\Data\\profile\\Default",
-        "debug_port": 9220,
+        "name": "84925599903",
+        "chrome_path": "D:\\Accounts\\Tele Accounts\\84925599903\\GoogleChromePortable\\GoogleChromePortable.exe",
+        "user_data_dir": "D:\\Accounts\\Tele Accounts\\84925599903\\GoogleChromePortable\\Data\\profile\\Default",
+        "debug_port": 9223,
     },
     {
-        "name": "Diễm Hằng Xinh Đẹp",
-        "chrome_path": "C:\\Others\\Tele Accounts\\84929895980\\GoogleChromePortable\\GoogleChromePortable.exe",
-        "user_data_dir": "C:\\Others\\Tele Accounts\\84929895980\\GoogleChromePortable\\Data\\profile\\Default",
-        "debug_port": 9221,
-    },
-    # {
-    #     "name": "Bình Minh Lên Rồi",
-    #     "chrome_path": "C:\\Others\\Tele Accounts\\84925599903\\GoogleChromePortable\\GoogleChromePortable.exe",
-    #     "user_data_dir": "C:\\Others\\Tele Accounts\\84925599903\\GoogleChromePortable\\Data\\profile\\Default",
-    #     "debug_port": 9222,
-    # },
-    # {
-    #     "name": "Đình Diệu Diệu Kỳ",
-    #     "chrome_path": "C:\\Others\\Tele Accounts\\84567845408\\GoogleChromePortable\\GoogleChromePortable.exe",
-    #     "user_data_dir": "C:\\Others\\Tele Accounts\\84567845408\\GoogleChromePortable\\Data\\profile\\Default",
-    #     "debug_port": 9223,
-    # },
-    {
-        "name": "Đức Trung Hải",
-        "chrome_path": "C:\\Others\\Tele Accounts\\84914418511\\GoogleChromePortable\\GoogleChromePortable.exe",
-        "user_data_dir": "C:\\Others\\Tele Accounts\\84914418511\\GoogleChromePortable\\Data\\profile\\Default",
+        "name": "84914418511",
+        "chrome_path": "D:\\Accounts\\Tele Accounts\\84914418511\\GoogleChromePortable\\GoogleChromePortable.exe",
+        "user_data_dir": "D:\\Accounts\\Tele Accounts\\84914418511\\GoogleChromePortable\\Data\\profile\\Default",
         "debug_port": 9224,
     },
     {
-        "name": "Bá Cường BMT",
-        "chrome_path": "C:\\Others\\Tele Accounts\\84918134941\\GoogleChromePortable\\GoogleChromePortable.exe",
-        "user_data_dir": "C:\\Others\\Tele Accounts\\84918134941\\GoogleChromePortable\\Data\\profile\\Default",
+        "name": "84918134941",
+        "chrome_path": "D:\\Accounts\\Tele Accounts\\84918134941\\GoogleChromePortable\\GoogleChromePortable.exe",
+        "user_data_dir": "D:\\Accounts\\Tele Accounts\\84918134941\\GoogleChromePortable\\Data\\profile\\Default",
         "debug_port": 9225,
     },
     {
-        "name": "Hải Sơn Thủy Hử",
-        "chrome_path": "C:\\Others\\Tele Accounts\\84816828974\\GoogleChromePortable\\GoogleChromePortable.exe",
-        "user_data_dir": "C:\\Others\\Tele Accounts\\84816828974\\GoogleChromePortable\\Data\\profile\\Default",
+        "name": "84816828974",
+        "chrome_path": "D:\\Accounts\\Tele Accounts\\84816828974\\GoogleChromePortable\\GoogleChromePortable.exe",
+        "user_data_dir": "D:\\Accounts\\Tele Accounts\\84816828974\\GoogleChromePortable\\Data\\profile\\Default",
         "debug_port": 9226,
     },
     {
-        "name": "Hồng Mai Đào",
-        "chrome_path": "C:\\Others\\Tele Accounts\\84852158289\\GoogleChromePortable\\GoogleChromePortable.exe",
-        "user_data_dir": "C:\\Others\\Tele Accounts\\84852158289\\GoogleChromePortable\\Data\\profile\\Default",
+        "name": "84852158289",
+        "chrome_path": "D:\\Accounts\\Tele Accounts\\84852158289\\GoogleChromePortable\\GoogleChromePortable.exe",
+        "user_data_dir": "D:\\Accounts\\Tele Accounts\\84852158289\\GoogleChromePortable\\Data\\profile\\Default",
         "debug_port": 9227,
     },
     {
-        "name": "Thu Thảo Thảo",
-        "chrome_path": "C:\\Others\\Tele Accounts\\84912161609\\GoogleChromePortable\\GoogleChromePortable.exe",
-        "user_data_dir": "C:\\Others\\Tele Accounts\\84912161609\\GoogleChromePortable\\Data\\profile\\Default",
+        "name": "84912161609",
+        "chrome_path": "D:\\Accounts\\Tele Accounts\\84912161609\\GoogleChromePortable\\GoogleChromePortable.exe",
+        "user_data_dir": "D:\\Accounts\\Tele Accounts\\84912161609\\GoogleChromePortable\\Data\\profile\\Default",
         "debug_port": 9228,
     }
 ]
 
-chrome_driver_path = r"C:\Workspace\Python\chromedriver.exe"
+chrome_driver_path = r"D:\Workspace\Python\chromedriver.exe"
 # Giữ nguyên phần accounts configuration như cũ
 
 # Global variables
@@ -100,8 +84,12 @@ def init_driver(account):
         options.add_argument("--disable-dev-shm-usage")
         options.add_argument("--disable-extensions")
         options.add_argument(f"--remote-debugging-port={account['debug_port']}")
+        # options.add_argument("--disable-cache") 
+        # options.add_argument("--clear-cache")
+        # options.add_experimental_option("excludeSwitches", ["enable-logging"])
         
         # Thêm các options để giảm tải tài nguyên
+        # options.add_argument("--headless")
         options.add_argument("--disable-gpu")
         options.add_argument("--disablce-software-rasterizer")
         options.add_argument("--disable-infobars")
@@ -127,16 +115,55 @@ def init_driver(account):
         print(f"Lỗi khởi tạo driver cho tài khoản {account['name']}: {e}")
         return None
 
-def perform_meta_cat_actions(driver, account):
+# Chat /up for daily checkin 
+def chat_actions(driver, account):
     try:
-        driver.get("https://web.telegram.org/k/#@MTZCat_bot")
+        driver.get("https://web.telegram.org/k/#-2043049770")
+        time.sleep(3)
+
+        WebDriverWait(driver, 15).until(
+            EC.presence_of_element_located((By.XPATH, '//span[contains(@class, "peer-title")]'))
+        )
+
+        message_box = WebDriverWait(driver, 15).until(
+            EC.element_to_be_clickable((By.XPATH, '//div[@contenteditable="true"]'))
+        )
+
+        wait_time = random.randint(1, 5)
+        time.sleep(wait_time)
+
+        message_box.send_keys('/up')
+        message_box.send_keys(Keys.ENTER)
+
+        time.sleep(3)
+        return True
+    except Exception as e:
+        print(f"Lỗi thao tác điểm danh ({account['name']}): {e}")
+        return False
+    
+
+def open_wallet_actions(driver, account):
+    try:
+        driver.get("https://web.telegram.org/k/#@UXUYbot")
         time.sleep(3)  # Random delay
 
         start_game_button = WebDriverWait(driver, 20).until(
-            EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), 'Start Game')]"))
+            EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), 'Wallet')]"))
         )
         start_game_button.click()
         time.sleep(3)
+
+        # Tìm và nhấp vào button có class 'popup-button btn primary rp'
+        try:
+            popup_button = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable((By.CLASS_NAME, "popup-button.btn.primary.rp"))
+            )
+            popup_button.click()
+            time.sleep(2)
+        except TimeoutException:
+            print("Không tìm thấy nút Launch, tiếp tục chạy chương trình...")
+        except Exception as e:
+            print(f"Lỗi không xác định khi tìm popup-button: {e}")
 
         WebDriverWait(driver, 20).until(
             EC.presence_of_element_located((By.TAG_NAME, "iframe"))
@@ -144,14 +171,10 @@ def perform_meta_cat_actions(driver, account):
         iframe = driver.find_element(By.TAG_NAME, "iframe")
         driver.switch_to.frame(iframe)
 
-        claim_now_button = WebDriverWait(driver, 20).until(
-            EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), 'Claim now')]"))
-        )
-        claim_now_button.click()
         time.sleep(3)
         return True
     except Exception as e:
-        print(f"Lỗi thao tác MetaCat Bot ({account['name']}): {e}")
+        print(f"Lỗi mở wallet ({account['name']}): {e}")
         return False
 
 def get_wait_time_from_countdown(driver, xpath, default_wait=60):
@@ -160,44 +183,40 @@ def get_wait_time_from_countdown(driver, xpath, default_wait=60):
             EC.presence_of_element_located((By.XPATH, xpath))
         )
         countdown_text = countdown_timer.text.strip()
-        hours, minutes, seconds = map(int, countdown_text.split(":"))
-        wait_time_seconds = hours * 3600 + minutes * 60 + seconds + 5
+        percents = float(countdown_text)  # Chuyển đổi thành số thập phân (float)
+        wait_time_seconds = (100 - percents) * 10800 / 100  # Tính thời gian chờ dựa trên phần trăm
         return wait_time_seconds
     except Exception as e:
         print(f"Lỗi tính thời gian chờ: {e}")
         return default_wait + random.uniform(5, 15)
+    
 
 def handle_single_claim_cycle(driver, account):
     try:
-        success = perform_meta_cat_actions(driver, account)
+        success = open_wallet_actions(driver, account)
         if not success:
             return 60  # Return default wait time if actions failed
 
-        claim_button = WebDriverWait(driver, 20).until(
-            EC.element_to_be_clickable((By.XPATH, "//img[@alt='Claim']"))
+        claim_button = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.CLASS_NAME, "bg-Orange"))
         )
         claim_button.click()
-        print(f"Đã Claim: {account['name']}")
-        time.sleep(10)
-
-        close_button = WebDriverWait(driver, 30).until(
-            EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Close')]"))
-        )
-        close_button.click()
-        print(f"Đã đóng: {account['name']}")
         time.sleep(5)
 
-        wait_time = get_wait_time_from_countdown(
-            driver,
-            "//div[contains(@class, 'bg-gradient-to-b')]//span[contains(text(), ':')]"
+        close_button = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//div[span[text()='Claim']]"))
         )
+        close_button.click()
+        time.sleep(5)
+
+        wait_time = 10805
         return wait_time
     except Exception as e:
         try:
             # Nếu không tìm thấy nút Claim, kiểm tra thời gian chờ
             wait_time = get_wait_time_from_countdown(
                 driver,
-                "//div[contains(@class, 'bg-gradient-to-b')]//span[contains(text(), ':')]"
+                "//span[@style=\"font-variant-numeric: tabular-nums;\"]"
             )
             return wait_time
 
@@ -251,27 +270,10 @@ def handle_daily_check_in(account):
             return
 
         active_drivers.put(driver)
-        success = perform_meta_cat_actions(driver, account)
+
+        success = chat_actions(driver, account)
         if not success:
             return
-
-        mission_button = WebDriverWait(driver, 20).until(
-            EC.element_to_be_clickable((By.XPATH, "//span[text()='Mission']"))
-        )
-        mission_button.click()
-        time.sleep(5 + random.uniform(1, 3))
-
-        try:
-            WebDriverWait(driver, 5).until(
-                EC.presence_of_element_located((By.XPATH, "//p[contains(text(), \"You've already checked in for today.\")]"))
-            )
-            print(f"Đã điểm danh trước đó: {account['name']}")
-        except:
-            check_in_button = WebDriverWait(driver, 20).until(
-                EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Check In')]"))
-            )
-            check_in_button.click()
-            print(f"Đã điểm danh: {account['name']}")
 
     except Exception as e:
         print(f"Lỗi điểm danh ({account['name']}): {e}")
@@ -291,8 +293,8 @@ def main():
     print("2: Claim tự động")
     action = input("Chọn (1/2): ")
 
-    target_hour = 6
-    target_minute = 45
+    target_hour = 3
+    target_minute = 5
 
     # Start shutdown timer
     shutdown_thread = threading.Thread(
@@ -302,25 +304,14 @@ def main():
     shutdown_thread.daemon = True
     shutdown_thread.start()
 
-    # Khởi tạo threads với delay
-    threads = []
-    for account in accounts:
-        if shutdown_event.is_set():
-            break
-
-        thread = threading.Thread(
-            target=handle_daily_check_in if action == "1" else handle_claim,
-            args=(account,)
-        )
-        thread.daemon = True
-        threads.append(thread)
-        thread.start()
-        # Delay giữa mỗi lần khởi động thread
-        time.sleep(4)
-
-    # Đợi tất cả threads hoàn thành
-    for thread in threads:
-        thread.join()
+    # Khởi tạo ThreadPoolExecutor
+    with ThreadPoolExecutor(max_workers=10) as executor:  # Chạy tối đa 10 luồng cùng lúc
+        for account in accounts:
+            if action == "1":
+                executor.submit(handle_daily_check_in, account)
+            else:
+                executor.submit(handle_claim, account)
+            time.sleep(10)  # Delay giữa các tài khoản
 
 if __name__ == "__main__":
     main()
