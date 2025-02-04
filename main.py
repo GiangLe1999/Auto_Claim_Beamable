@@ -86,10 +86,9 @@ def init_driver(account):
         options.add_argument(f"--remote-debugging-port={account['debug_port']}")
         # options.add_argument("--disable-cache") 
         # options.add_argument("--clear-cache")
-        # options.add_experimental_option("excludeSwitches", ["enable-logging"])
         
         # Thêm các options để giảm tải tài nguyên
-        # options.add_argument("--headless")
+        options.add_argument("--headless")
         options.add_argument("--disable-gpu")
         options.add_argument("--disablce-software-rasterizer")
         options.add_argument("--disable-infobars")
@@ -161,7 +160,7 @@ def open_wallet_actions(driver, account):
             popup_button.click()
             time.sleep(2)
         except TimeoutException:
-            print("Không tìm thấy nút Launch, tiếp tục chạy chương trình...")
+            print(f"Không tìm thấy nút Launch, tiếp tục chạy chương trình cho ({account['name']})")
         except Exception as e:
             print(f"Lỗi không xác định khi tìm popup-button: {e}")
 
