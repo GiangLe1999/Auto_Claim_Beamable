@@ -13,6 +13,7 @@ from queue import Queue
 import random
 from concurrent.futures import ThreadPoolExecutor
 
+
 # Cấu hình tài khoản
 accounts = [
     {
@@ -90,22 +91,22 @@ def init_driver(account):
         # Thêm các options để giảm tải tài nguyên
         options.add_argument("--headless")
         options.add_argument("--disable-gpu")
-        options.add_argument("--disablce-software-rasterizer")
-        options.add_argument("--disable-infobars")
-        options.add_argument("--disable-notifications")
-        options.add_argument("--disable-logging")
-        options.add_argument("--disable-default-apps")
-        options.add_argument("--disable-popup-blocking")
-        options.add_argument("--disable-prompt-on-repost")
-        options.add_argument("--disable-sync")
-        options.add_argument("--disable-web-security")
-        options.add_argument("--disable-translate")
-        options.add_argument("--disable-hang-monitor")
-        options.add_argument("--disable-client-side-phishing-detection")
-        options.add_argument("--disable-component-update")
-        options.add_argument("--memory-model=low")
-        options.add_argument("--disable-backing-store-limit")
-        options.add_argument("--enable-unsafe-swiftshader")
+        # options.add_argument("--disablce-software-rasterizer")
+        # options.add_argument("--disable-infobars")
+        # options.add_argument("--disable-notifications")
+        # options.add_argument("--disable-logging")
+        # options.add_argument("--disable-default-apps")
+        # options.add_argument("--disable-popup-blocking")
+        # options.add_argument("--disable-prompt-on-repost")
+        # options.add_argument("--disable-sync")
+        # options.add_argument("--disable-web-security")
+        # options.add_argument("--disable-translate")
+        # options.add_argument("--disable-hang-monitor")
+        # options.add_argument("--disable-client-side-phishing-detection")
+        # options.add_argument("--disable-component-update")
+        # options.add_argument("--memory-model=low")
+        # options.add_argument("--disable-backing-store-limit")
+        # options.add_argument("--enable-unsafe-swiftshader")
         
         service = Service(chrome_driver_path)
         driver = webdriver.Chrome(service=service, options=options)
