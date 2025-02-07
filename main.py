@@ -20,37 +20,37 @@ accounts = [
         "name": "84925599903",
         "chrome_path": "D:\\Accounts\\Tele Accounts\\84925599903\\GoogleChromePortable\\GoogleChromePortable.exe",
         "user_data_dir": "D:\\Accounts\\Tele Accounts\\84925599903\\GoogleChromePortable\\Data\\profile\\Default",
-        "debug_port": 9223,
+        "debug_port": 9500,
     },
     {
         "name": "84914418511",
         "chrome_path": "D:\\Accounts\\Tele Accounts\\84914418511\\GoogleChromePortable\\GoogleChromePortable.exe",
         "user_data_dir": "D:\\Accounts\\Tele Accounts\\84914418511\\GoogleChromePortable\\Data\\profile\\Default",
-        "debug_port": 9224,
+        "debug_port": 9501,
     },
     {
         "name": "84918134941",
         "chrome_path": "D:\\Accounts\\Tele Accounts\\84918134941\\GoogleChromePortable\\GoogleChromePortable.exe",
         "user_data_dir": "D:\\Accounts\\Tele Accounts\\84918134941\\GoogleChromePortable\\Data\\profile\\Default",
-        "debug_port": 9225,
+        "debug_port": 9502,
     },
     {
         "name": "84816828974",
         "chrome_path": "D:\\Accounts\\Tele Accounts\\84816828974\\GoogleChromePortable\\GoogleChromePortable.exe",
         "user_data_dir": "D:\\Accounts\\Tele Accounts\\84816828974\\GoogleChromePortable\\Data\\profile\\Default",
-        "debug_port": 9226,
+        "debug_port": 9503,
     },
     {
         "name": "84852158289",
         "chrome_path": "D:\\Accounts\\Tele Accounts\\84852158289\\GoogleChromePortable\\GoogleChromePortable.exe",
         "user_data_dir": "D:\\Accounts\\Tele Accounts\\84852158289\\GoogleChromePortable\\Data\\profile\\Default",
-        "debug_port": 9227,
+        "debug_port": 9504,
     },
     {
         "name": "84912161609",
         "chrome_path": "D:\\Accounts\\Tele Accounts\\84912161609\\GoogleChromePortable\\GoogleChromePortable.exe",
         "user_data_dir": "D:\\Accounts\\Tele Accounts\\84912161609\\GoogleChromePortable\\Data\\profile\\Default",
-        "debug_port": 9228,
+        "debug_port": 9505,
     }
 ]
 
@@ -80,33 +80,13 @@ def init_driver(account):
     try:
         options = webdriver.ChromeOptions()
         options.binary_location = account["chrome_path"]
-        options.add_argument(f"--user-data-dir={account['user_data_dir']}")
         options.add_argument("--no-sandbox")
-        options.add_argument("--disable-dev-shm-usage")
-        options.add_argument("--disable-extensions")
-        options.add_argument(f"--remote-debugging-port={account['debug_port']}")
-        # options.add_argument("--disable-cache") 
-        # options.add_argument("--clear-cache")
-        
-        # Thêm các options để giảm tải tài nguyên
         options.add_argument("--headless")
         options.add_argument("--disable-gpu")
-        # options.add_argument("--disablce-software-rasterizer")
-        # options.add_argument("--disable-infobars")
-        # options.add_argument("--disable-notifications")
-        # options.add_argument("--disable-logging")
-        # options.add_argument("--disable-default-apps")
-        # options.add_argument("--disable-popup-blocking")
-        # options.add_argument("--disable-prompt-on-repost")
-        # options.add_argument("--disable-sync")
-        # options.add_argument("--disable-web-security")
-        # options.add_argument("--disable-translate")
-        # options.add_argument("--disable-hang-monitor")
-        # options.add_argument("--disable-client-side-phishing-detection")
-        # options.add_argument("--disable-component-update")
-        # options.add_argument("--memory-model=low")
-        # options.add_argument("--disable-backing-store-limit")
-        # options.add_argument("--enable-unsafe-swiftshader")
+        options.add_argument("--disable-dev-shm-usage")
+        options.add_argument("--disable-extensions")
+        options.add_argument(f"--user-data-dir={account['user_data_dir']}")
+        options.add_argument(f"--remote-debugging-port={account['debug_port']}")
         
         service = Service(chrome_driver_path)
         driver = webdriver.Chrome(service=service, options=options)
@@ -311,7 +291,7 @@ def main():
                 executor.submit(handle_daily_check_in, account)
             else:
                 executor.submit(handle_claim, account)
-            time.sleep(10)  # Delay giữa các tài khoản
+            time.sleep(5)  # Delay giữa các tài khoản
 
 if __name__ == "__main__":
     main()
