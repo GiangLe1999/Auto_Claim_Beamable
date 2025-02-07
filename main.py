@@ -6,13 +6,12 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import TimeoutException
 import time
-import os
-import datetime
-import threading
+# import os
+# import datetime
+# import threading
 from queue import Queue
 import random
 from concurrent.futures import ThreadPoolExecutor
-
 
 # Cấu hình tài khoản
 accounts = [
@@ -58,35 +57,36 @@ chrome_driver_path = r"D:\Workspace\Python\chromedriver.exe"
 # Giữ nguyên phần accounts configuration như cũ
 
 # Global variables
-shutdown_event = threading.Event()
+# shutdown_event = threading.Event()
 active_drivers = Queue()
-MAX_CONCURRENT_DRIVERS = 30
+MAX_CONCURRENT_DRIVERS = 2
 
-def shutdown_at_target_time(target_hour, target_minute):
-    print(f"Hẹn giờ tắt máy lúc {target_hour:02d}:{target_minute:02d} (giờ Việt Nam)...")
-    while not shutdown_event.is_set():
-        now = datetime.datetime.now()
-        if now.hour == target_hour and now.minute >= target_minute:
-            print("Đã đến thời gian hẹn giờ! Dừng chương trình và tắt máy tính...")
-            shutdown_event.set()
-            if os.name == 'nt':
-                os.system("shutdown /s /t 1")
-            else:
-                os.system("shutdown now")
-            break
-        time.sleep(10)
+# def shutdown_at_target_time(target_hour, target_minute):
+#     print(f"Hẹn giờ tắt máy lúc {target_hour:02d}:{target_minute:02d} (giờ Việt Nam)...")
+#     while not shutdown_event.is_set():
+#         now = datetime.datetime.now()
+#         if now.hour == target_hour and now.minute >= target_minute:
+#             print("Đã đến thời gian hẹn giờ! Dừng chương trình và tắt máy tính...")
+#             shutdown_event.set()
+#             if os.name == 'nt':
+#                 os.system("shutdown /s /t 1")
+#             else:
+#                 os.system("shutdown now")
+#             break
+#         time.sleep(10)
 
 def init_driver(account):
     try:
         options = webdriver.ChromeOptions()
         options.binary_location = account["chrome_path"]
-        options.add_argument("--no-sandbox")
         options.add_argument("--headless")
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-dev-shm-usage") # Giúp tránh lỗi bộ nhớ dùng chung bị giới hạn
         options.add_argument("--disable-gpu")
-        options.add_argument("--disable-dev-shm-usage")
         options.add_argument("--disable-extensions")
         options.add_argument(f"--user-data-dir={account['user_data_dir']}")
         options.add_argument(f"--remote-debugging-port={account['debug_port']}")
+        options.page_load_strategy = 'normal'
         
         service = Service(chrome_driver_path)
         driver = webdriver.Chrome(service=service, options=options)
@@ -206,13 +206,13 @@ def handle_single_claim_cycle(driver, account):
             return wait_time
 
 def handle_claim(account):
-    while not shutdown_event.is_set():
+    while True:
         try:
             # Đợi cho đến khi có slot trống
             while active_drivers.qsize() >= MAX_CONCURRENT_DRIVERS:
-                time.sleep(1)
-                if shutdown_event.is_set():
-                    return
+                time.sleep(5)
+                # if shutdown_event.is_set():
+                #     return
 
             driver = init_driver(account)
             if not driver:
@@ -241,9 +241,9 @@ def handle_daily_check_in(account):
     try:
         # Đợi cho đến khi có slot trống
         while active_drivers.qsize() >= MAX_CONCURRENT_DRIVERS:
-            time.sleep(1)
-            if shutdown_event.is_set():
-                return
+            time.sleep(5)
+            # if shutdown_event.is_set():
+            #     return
 
         driver = init_driver(account)
         if not driver:
@@ -273,16 +273,16 @@ def main():
     print("2: Claim tự động")
     action = input("Chọn (1/2): ")
 
-    target_hour = 3
-    target_minute = 5
+    # target_hour = 3
+    # target_minute = 5
 
     # Start shutdown timer
-    shutdown_thread = threading.Thread(
-        target=shutdown_at_target_time,
-        args=(target_hour, target_minute)
-    )
-    shutdown_thread.daemon = True
-    shutdown_thread.start()
+    # shutdown_thread = threading.Thread(
+    #     target=shutdown_at_target_time,
+    #     args=(target_hour, target_minute)
+    # )
+    # shutdown_thread.daemon = True
+    # shutdown_thread.start()
 
     # Khởi tạo ThreadPoolExecutor
     with ThreadPoolExecutor(max_workers=10) as executor:  # Chạy tối đa 10 luồng cùng lúc
