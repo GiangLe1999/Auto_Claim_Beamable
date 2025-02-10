@@ -54,12 +54,11 @@ accounts = [
 ]
 
 chrome_driver_path = r"D:\Workspace\Python\chromedriver.exe"
-# Giữ nguyên phần accounts configuration như cũ
 
 # Global variables
 # shutdown_event = threading.Event()
 active_drivers = Queue()
-MAX_CONCURRENT_DRIVERS = 2
+MAX_CONCURRENT_DRIVERS = 1
 
 # def shutdown_at_target_time(target_hour, target_minute):
 #     print(f"Hẹn giờ tắt máy lúc {target_hour:02d}:{target_minute:02d} (giờ Việt Nam)...")
@@ -86,6 +85,23 @@ def init_driver(account):
         options.add_argument("--disable-extensions")
         options.add_argument(f"--user-data-dir={account['user_data_dir']}")
         options.add_argument(f"--remote-debugging-port={account['debug_port']}")
+
+        options.add_argument("--disable-software-rasterizer")
+        options.add_argument("--disable-infobars")
+        options.add_argument("--disable-notifications")
+        options.add_argument("--disable-logging")
+        options.add_argument("--disable-default-apps")
+        options.add_argument("--disable-popup-blocking")
+        options.add_argument("--disable-prompt-on-repost")
+        options.add_argument("--disable-sync")
+        options.add_argument("--disable-web-security")
+        options.add_argument("--disable-translate")
+        options.add_argument("--disable-hang-monitor")
+        options.add_argument("--disable-client-side-phishing-detection")
+        options.add_argument("--disable-component-update")
+        options.add_argument("--memory-model=low")
+        options.add_argument("--disable-backing-store-limit")
+        options.add_argument("--enable-unsafe-swiftshader")
         options.page_load_strategy = 'normal'
         
         service = Service(chrome_driver_path)
@@ -210,7 +226,7 @@ def handle_claim(account):
         try:
             # Đợi cho đến khi có slot trống
             while active_drivers.qsize() >= MAX_CONCURRENT_DRIVERS:
-                time.sleep(5)
+                time.sleep(30)
                 # if shutdown_event.is_set():
                 #     return
 
@@ -241,7 +257,7 @@ def handle_daily_check_in(account):
     try:
         # Đợi cho đến khi có slot trống
         while active_drivers.qsize() >= MAX_CONCURRENT_DRIVERS:
-            time.sleep(5)
+            time.sleep(30)
             # if shutdown_event.is_set():
             #     return
 
@@ -291,7 +307,7 @@ def main():
                 executor.submit(handle_daily_check_in, account)
             else:
                 executor.submit(handle_claim, account)
-            time.sleep(5)  # Delay giữa các tài khoản
+            time.sleep(30)  # Delay giữa các tài khoản
 
 if __name__ == "__main__":
     main()
