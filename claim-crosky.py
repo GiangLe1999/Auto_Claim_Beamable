@@ -16,12 +16,60 @@ from selenium.webdriver.common.action_chains import ActionChains
 
 # Cấu hình tài khoản
 accounts = [
+    # {
+    #     "name": "84523929485",
+    #     "chrome_path": "D:\\Accounts\\Tele Accounts\\84523929485\\GoogleChromePortable\\GoogleChromePortable.exe",
+    #     "user_data_dir": "D:\\Accounts\\Tele Accounts\\84523929485\\GoogleChromePortable\\Data\\profile\\Default",
+    #     "debug_port": 9499,
+    # },
+    # {
+    #     "name": "84925599903",
+    #     "chrome_path": "D:\\Accounts\\Tele Accounts\\84925599903\\GoogleChromePortable\\GoogleChromePortable.exe",
+    #     "user_data_dir": "D:\\Accounts\\Tele Accounts\\84925599903\\GoogleChromePortable\\Data\\profile\\Default",
+    #     "debug_port": 9500,
+    # },
+    # {
+    #     "name": "84914418511",
+    #     "chrome_path": "D:\\Accounts\\Tele Accounts\\84914418511\\GoogleChromePortable\\GoogleChromePortable.exe",
+    #     "user_data_dir": "D:\\Accounts\\Tele Accounts\\84914418511\\GoogleChromePortable\\Data\\profile\\Default",
+    #     "debug_port": 9501,
+    # },
+    # {
+    #     "name": "84918134941",
+    #     "chrome_path": "D:\\Accounts\\Tele Accounts\\84918134941\\GoogleChromePortable\\GoogleChromePortable.exe",
+    #     "user_data_dir": "D:\\Accounts\\Tele Accounts\\84918134941\\GoogleChromePortable\\Data\\profile\\Default",
+    #     "debug_port": 9502,
+    # },
+    # {
+    #     "name": "84816828974",
+    #     "chrome_path": "D:\\Accounts\\Tele Accounts\\84816828974\\GoogleChromePortable\\GoogleChromePortable.exe",
+    #     "user_data_dir": "D:\\Accounts\\Tele Accounts\\84816828974\\GoogleChromePortable\\Data\\profile\\Default",
+    #     "debug_port": 9503,
+    # },
+    # {
+    #     "name": "84852158289",
+    #     "chrome_path": "D:\\Accounts\\Tele Accounts\\84852158289\\GoogleChromePortable\\GoogleChromePortable.exe",
+    #     "user_data_dir": "D:\\Accounts\\Tele Accounts\\84852158289\\GoogleChromePortable\\Data\\profile\\Default",
+    #     "debug_port": 9504,
+    # },
+    # {
+    #     "name": "84912161609",
+    #     "chrome_path": "D:\\Accounts\\Tele Accounts\\84912161609\\GoogleChromePortable\\GoogleChromePortable.exe",
+    #     "user_data_dir": "D:\\Accounts\\Tele Accounts\\84912161609\\GoogleChromePortable\\Data\\profile\\Default",
+    #     "debug_port": 9505,
+    # },
     {
-        "name": "84523929485",
-        "chrome_path": "D:\\Accounts\\Tele Accounts\\84523929485\\GoogleChromePortable\\GoogleChromePortable.exe",
-        "user_data_dir": "D:\\Accounts\\Tele Accounts\\84523929485\\GoogleChromePortable\\Data\\profile\\Default",
-        "debug_port": 9499,
-    }
+        "name": "84563639029",
+        "chrome_path": "D:\\Accounts\\Tele Accounts\\84563639029\\GoogleChromePortable\\GoogleChromePortable.exe",
+        "user_data_dir": "D:\\Accounts\\Tele Accounts\\84563639029\\GoogleChromePortable\\Data\\profile\\Default",
+        "debug_port": 9506,
+    },
+    # {
+    #     "name": "84379145648",
+    #     "chrome_path": "D:\\Accounts\\Tele Accounts\\84379145648\\GoogleChromePortable\\GoogleChromePortable.exe",
+    #     "user_data_dir": "D:\\Accounts\\Tele Accounts\\84379145648\\GoogleChromePortable\\Data\\profile\\Default",
+    #     "debug_port": 9507,
+    # },
 ]
 
 chrome_driver_path = r"D:\Workspace\Python\chromedriver.exe"
@@ -57,6 +105,10 @@ def init_driver(account):
         options.add_argument("--memory-model=low")
         options.add_argument("--disable-backing-store-limit")
         options.add_argument("--enable-unsafe-swiftshader")
+        # Tránh sử dụng trình duyệt và sử dụng automation
+        options.add_argument("--disable-blink-features=AutomationControlled")
+        options.add_experimental_option("excludeSwitches", ["enable-automation"])
+        options.add_experimental_option("useAutomationExtension", False)
         options.page_load_strategy = 'normal'
         
         service = Service(chrome_driver_path)
@@ -72,10 +124,27 @@ def single_task(driver, account):
         time.sleep(3)  # Đợi trang tải
 
         # Tìm button có text "Connect Wallet"
-        checkin_button = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, "//button[span[contains(text(), 'Check-in')]]"))
+        checkin_div = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, "//div[contains(@class, 'checkin-action')]"))
         )
-        checkin_button.click()
+        checkin_div.click()
+
+        time.sleep(3)
+
+        # Tìm thẻ div có thẻ span chứa text "OKX"
+        choose_wallet_element = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, "//div[span[contains(text(), 'OKX')]]"))
+        )
+        choose_wallet_element.click()
+        time.sleep(3)
+
+        # Tìm button có text "Connect Wallet"
+        checkin_div = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, "//div[contains(@class, 'checkin-action')]"))
+        )
+        checkin_div.click()
+
+
         print(f"Đã nhấn vào nút Checkin của '{account['name']}'.")
         time.sleep(3)
 
@@ -119,6 +188,7 @@ def main():
     with ThreadPoolExecutor(max_workers=10) as executor:  # Chạy tối đa 10 luồng cùng lúc
         for account in accounts:
             executor.submit(proceed, account)
+        time.sleep(30)  # Delay giữa các tài khoản
 
 if __name__ == "__main__":
     main()

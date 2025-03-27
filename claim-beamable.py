@@ -52,18 +52,18 @@ accounts = [
     #     "user_data_dir": "D:\\Accounts\\Tele Accounts\\84912161609\\GoogleChromePortable\\Data\\profile\\Default",
     #     "debug_port": 9505,
     # },
-    # {
-    #     "name": "84563639029",
-    #     "chrome_path": "D:\\Accounts\\Tele Accounts\\84563639029\\GoogleChromePortable\\GoogleChromePortable.exe",
-    #     "user_data_dir": "D:\\Accounts\\Tele Accounts\\84563639029\\GoogleChromePortable\\Data\\profile\\Default",
-    #     "debug_port": 9506,
-    # },
     {
-        "name": "84379145648",
-        "chrome_path": "D:\\Accounts\\Tele Accounts\\84379145648\\GoogleChromePortable\\GoogleChromePortable.exe",
-        "user_data_dir": "D:\\Accounts\\Tele Accounts\\84379145648\\GoogleChromePortable\\Data\\profile\\Default",
-        "debug_port": 9507,
+        "name": "84563639029",
+        "chrome_path": "D:\\Accounts\\Tele Accounts\\84563639029\\GoogleChromePortable\\GoogleChromePortable.exe",
+        "user_data_dir": "D:\\Accounts\\Tele Accounts\\84563639029\\GoogleChromePortable\\Data\\profile\\Default",
+        "debug_port": 9506,
     },
+    # {
+    #     "name": "84379145648",
+    #     "chrome_path": "D:\\Accounts\\Tele Accounts\\84379145648\\GoogleChromePortable\\GoogleChromePortable.exe",
+    #     "user_data_dir": "D:\\Accounts\\Tele Accounts\\84379145648\\GoogleChromePortable\\Data\\profile\\Default",
+    #     "debug_port": 9507,
+    # },
 ]
 
 chrome_driver_path = r"D:\Workspace\Python\chromedriver.exe"
@@ -176,7 +176,7 @@ def main():
     with ThreadPoolExecutor(max_workers=10) as executor:  # Chạy tối đa 10 luồng cùng lúc
         for account in accounts:
             executor.submit(proceed, account)
-        time.sleep(60)  # Delay giữa các tài khoản
+        time.sleep(30)  # Delay giữa các tài khoản
 
 
 if __name__ == "__main__":
